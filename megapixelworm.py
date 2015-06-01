@@ -3,28 +3,66 @@
 # worm with improved collision detection
 # 1/7/2015
 
-import pygame
-import random
+import pygame, random, sys
+from pygame.locals import *
+
+pygame.init()
 
 # directions of movement
-UP = (0, -1)
-DOWN = (0, 1)
-LEFT = (-1, 0)
+UP    = (0, -1)
+DOWN  = (0, 1)
+LEFT  = (-1, 0)
 RIGHT = (1, 0)
 
-# color values
-GREEN = (0, 255, 0)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+# basic colors
+#          R    G    B
+RED   = ( 255,   0,   0 )
+GREEN = (   0, 255,   0 )
+BLUE  = (   0,   0, 255 )
+WHITE = ( 255, 255, 255 )
+BLACK = (   0,   0,   0 )
 
+# window dimensions
+width       = 640
+height      = 430
+titleHeight = 50
+pygame.display.set_caption('Hungry Snake Challenge')
+
+# set up the blank black screen
+screen     = pygame.display.set_mode((width, (height+titleHeight)))
+screenRect = screen.get_rect()
+screen.fill((BLACK))
+
+# set the clock and infinite loop
+FPS      = 240
+fpsClock = pygame.time.Clock()
+running  = True
+
+# Content and Position of Title text
+titleText       = pygame.font.Font( 'freesansbold.ttf', 48 )
+titleSurfaceObj = titleText.render( 'Hungry Snake Challenge', True, GREEN, BLUE )
+titleRectObj    = titleSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery - 100 ) )
+
+# Content and Position of Game Over text
+gameOverText       = pygame.font.Font( 'freesansbold.ttf', 48 )
+gameOverSurfaceObj = gameOverText.render( 'GAME OVER', True, WHITE )
+gameOverRectObj    = gameOverSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery - 100 ) )
+
+# Content and Position of Press a Key text
+pressKeyText       = pygame.font.Font( 'freesansbold.ttf', 18 )
+pressKeySurfaceObj = pressKeyText.render( 'Press any key...', True, WHITE )
+pressKeyRectObj    = pressKeySurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 100 ) )
+
+
+###### CLASS AND FUNCTION DEFINITIONS ######
 class TitleBar:
     """ Text and Title bar at the bottom of screen """
     
     def __init__(self, surface):
-        pygame.font.init()
         self.surface = surface
-        self.font = pygame.font.SysFont(None, 36)
-        self.score = 0
+        self.font    = pygame.font.SysFont(None, 36)
+        self.score   = 0
+        
         self.drawTitle()
         self.drawTitleBox()
         self.drawScore()
@@ -52,8 +90,6 @@ class TitleBar:
         self.drawTitleBox()
         self.drawScore()
         
-        
-
 class Food:
     """ a piece of food """
 
@@ -67,7 +103,6 @@ class Food:
 
     def erase(self):
         pygame.draw.circle(self.surface, (BLACK), (self.x, self.y), 5, 0)
-        
         
 class Worm:
     """ a worm """
@@ -154,20 +189,39 @@ class Worm:
                 print(self.numTotalEaten)
                 titleBar.updateScore(self.numTotalEaten)
                 titleBar.showScore()
-        
 
-# window dimensions
-width = 640
-height = 400
-titleHeight = 50
+def keyPressed():
+    """ Removes KEYDOWN events from the event queue
+        and returns KEYUP events """
+    checkForQuit()
+    for event in pygame.event.get( [ KEYDOWN, KEYUP ] ):
+        if event.type == KEYDOWN:
+            continue
+        return event.key
+    return None
+    
 
-# set up the blank black screen
-screen = pygame.display.set_mode((width, (height+titleHeight)))
-screen.fill((BLACK))
+def checkForQuit():
+    for event in pygame.event.get(QUIT): # get all the QUIT events
+        terminate() # terminate if any QUIT events are present
+    for event in pygame.event.get(KEYUP): # get all the KEYUP events
+        if event.key == K_ESCAPE:
+            terminate() # terminate if the KEYUP event was for the Esc key
+        pygame.event.post(event) # put the other KEYUP event objects back
 
-# set the clock and infinite loop
-clock = pygame.time.Clock()
-running = True
+def terminate():
+    pygame.quit()
+    sys.exit()
+###### END OF DEFINITIONS ######
+
+# main game loop
+screen.blit( titleSurfaceObj, titleRectObj ) # display title text
+screen.blit( pressKeySurfaceObj, pressKeyRectObj ) # display press any key text
+while keyPressed() == None:
+    pygame.display.update()
+    fpsClock.tick( FPS )
+
+screen.fill(BLACK)
 
 # create our Worm, food, and title objects
 worm = Worm(screen, int(round(width / 2)), int(round(height / 2)), 200)
@@ -196,5 +250,5 @@ while running:
         
 
     pygame.display.flip()
-    clock.tick(240)
+    fpsClock.tick(FPS)
 pygame.quit()
