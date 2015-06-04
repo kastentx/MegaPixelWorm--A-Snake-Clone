@@ -1,6 +1,6 @@
 # Nick Kasten
 # megapixelworm.py
-# worm with improved collision detection
+# Mega Pixel Worm: A Snake Clone
 # 1/7/2015
 
 import pygame, random, sys
@@ -26,7 +26,7 @@ BLACK = (   0,   0,   0 )
 width       = 640
 height      = 430
 titleHeight = 50
-pygame.display.set_caption('Hungry Snake Challenge')
+pygame.display.set_caption("Hungry Snake Challenge")
 
 # set up the blank black screen
 screen     = pygame.display.set_mode((width, (height+titleHeight)))
@@ -39,20 +39,19 @@ fpsClock = pygame.time.Clock()
 running  = True
 
 # Content and Position of Title text
-titleText       = pygame.font.Font( 'freesansbold.ttf', 48 )
-titleSurfaceObj = titleText.render( 'Hungry Snake Challenge', True, GREEN, BLUE )
+titleText       = pygame.font.Font( "freesansbold.ttf", 48 )
+titleSurfaceObj = titleText.render( "Megal Pixel Worm", True, GREEN, BLUE )
 titleRectObj    = titleSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery - 100 ) )
 
 # Content and Position of Game Over text
-gameOverText       = pygame.font.Font( 'freesansbold.ttf', 48 )
-gameOverSurfaceObj = gameOverText.render( 'GAME OVER', True, WHITE )
+gameOverText       = pygame.font.Font( "freesansbold.ttf", 48 )
+gameOverSurfaceObj = gameOverText.render( "GAME OVER", True, WHITE )
 gameOverRectObj    = gameOverSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery - 100 ) )
 
 # Content and Position of Press a Key text
-pressKeyText       = pygame.font.Font( 'freesansbold.ttf', 18 )
-pressKeySurfaceObj = pressKeyText.render( 'Press any key...', True, WHITE )
+pressKeyText       = pygame.font.Font( "freesansbold.ttf", 18 )
+pressKeySurfaceObj = pressKeyText.render( "Press any key...", True, WHITE )
 pressKeyRectObj    = pressKeySurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 100 ) )
-
 
 ###### CLASS AND FUNCTION DEFINITIONS ######
 class TitleBar:
@@ -71,7 +70,7 @@ class TitleBar:
         pygame.draw.rect(self.surface, WHITE, (0, height, width, titleHeight), 2)
 
     def drawTitle(self):
-        title = self.font.render("Hungry Snake Challenge", True, WHITE)
+        title = self.font.render("Megal Pixel Worm", True, WHITE)
         self.surface.blit(title, (5, (height+10)))
 
     def updateScore(self, score):
@@ -212,16 +211,36 @@ def checkForQuit():
 def terminate():
     pygame.quit()
     sys.exit()
+
+def showTitle():
+    screen.blit( titleSurfaceObj, titleRectObj ) # display title text
+    screen.blit( pressKeySurfaceObj, pressKeyRectObj ) # display press any key text
+    while keyPressed() == None:
+        pygame.display.update()
+        fpsClock.tick( FPS )
+
+    screen.fill(BLACK)
+
+def showGameOver(titleBar):
+    # Content and Position of Final Score Text
+    finalScoreText       = pygame.font.Font( "freesansbold.ttf", 18 )
+    finalScoreSurfaceObj = finalScoreText.render( "You scored %d points!" % titleBar.score, True, WHITE )
+    finalScoreRectObj    = finalScoreSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 50 ) )    
+    screen.fill(BLACK)
+
+    screen.blit( gameOverSurfaceObj, gameOverRectObj ) # display game over text
+    screen.blit( pressKeySurfaceObj, pressKeyRectObj ) # display press any key text
+    screen.blit( finalScoreSurfaceObj, finalScoreRectObj ) # display final score text
+
+    while keyPressed() == None:
+        pygame.display.update()
+        fpsClock.tick( FPS )
+
+    screen.fill(BLACK)   
 ###### END OF DEFINITIONS ######
 
 # main game loop
-screen.blit( titleSurfaceObj, titleRectObj ) # display title text
-screen.blit( pressKeySurfaceObj, pressKeyRectObj ) # display press any key text
-while keyPressed() == None:
-    pygame.display.update()
-    fpsClock.tick( FPS )
-
-screen.fill(BLACK)
+showTitle()
 
 # create our Worm, food, and title objects
 worm = Worm(screen, int(round(width / 2)), int(round(height / 2)), 200)
@@ -235,6 +254,7 @@ while running:
     
     if worm.crashed or worm.x <= 0 or worm.x >= width-1 or worm.y <= 0 or worm.y >= height-1:
         print("You Crashed!")
+        showGameOver(titleBar)
         running = False
     elif worm.eating:
         food.erase()
