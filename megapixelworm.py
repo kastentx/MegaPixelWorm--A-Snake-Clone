@@ -3,10 +3,14 @@
 # Mega Pixel Worm: A Snake Clone
 # 1/7/2015
 
-import pygame, random, sys
+import pygame, random, sys, shelve
 from pygame.locals import *
 
+# initialize pygame and high score
 pygame.init()
+d = shelve.open('score.txt')
+if 'score' not in d:
+   d['score'] = 0
 
 # directions of movement
 UP    = (0, -1)
@@ -222,14 +226,21 @@ def showTitle():
     screen.fill(BLACK)
 
 def showGameOver(titleBar):
+# Content and Position of High Score Text
+    highScoreText       = pygame.font.Font( "freesansbold.ttf", 18 )
+    highScoreSurfaceObj = highScoreText.render( "Current High Score is %d points!" % d['score'], True, WHITE )
+    highScoreRectObj    = highScoreSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 10 ) )        
+
     # Content and Position of Final Score Text
     finalScoreText       = pygame.font.Font( "freesansbold.ttf", 18 )
-    finalScoreSurfaceObj = finalScoreText.render( "You scored %d points!" % titleBar.score, True, WHITE )
+    finalScoreSurfaceObj = finalScoreText.render( "You scored %d." % titleBar.score, True, WHITE )
     finalScoreRectObj    = finalScoreSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 50 ) )    
+
     screen.fill(BLACK)
 
     screen.blit( gameOverSurfaceObj, gameOverRectObj ) # display game over text
     screen.blit( pressKeySurfaceObj, pressKeyRectObj ) # display press any key text
+    screen.blit( highScoreSurfaceObj, highScoreRectObj ) # display high score text    
     screen.blit( finalScoreSurfaceObj, finalScoreRectObj ) # display final score text
 
     while keyPressed() == None:
@@ -247,28 +258,35 @@ worm = Worm(screen, int(round(width / 2)), int(round(height / 2)), 200)
 food = Food(screen)
 titleBar = TitleBar(screen)
 
+# while the game is still running
 while running:
-
-    worm.draw()
-    worm.move()
-    
+    # draw the worm and update its current position
+    worm.draw() 
+    worm.move() 
+    # if the worm has crashed or gone out of bounds, the game is over
     if worm.crashed or worm.x <= 0 or worm.x >= width-1 or worm.y <= 0 or worm.y >= height-1:
         print("You Crashed!")
+        # check to see if current score is the new high score
+        if titleBar.score > d['score']:
+            d['score'] = titleBar.score
+        # show the game over message
         showGameOver(titleBar)
+        d.close()
+        # quit the game
         running = False
+    # if the worm eats, draw some new food
     elif worm.eating:
         food.erase()
         worm.draw(True)
         food = Food(screen)
         worm.eating = False
-
+    # check for input from the player
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
             worm.keyEvent(event)
-        
-
+    # update the game display
     pygame.display.flip()
     fpsClock.tick(FPS)
 pygame.quit()
