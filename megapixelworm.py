@@ -3,16 +3,10 @@
 # Mega Pixel Worm: A Snake Clone
 # 1/7/2015
 
-# dataFile = shelve.open('score.txt') # here you will save the score variable   
-# d['score'] = score           # thats all, now it is saved on disk.
-# d.close()
-
-import pygame, random, sys, shelve
+import pygame, random, sys
 from pygame.locals import *
 
-# initialize pygame and retrieve high scores
 pygame.init()
-dataFile = shelve.open('score.txt') 
 
 # directions of movement
 UP    = (0, -1)
@@ -231,18 +225,11 @@ def showGameOver(titleBar):
     # Content and Position of Final Score Text
     finalScoreText       = pygame.font.Font( "freesansbold.ttf", 18 )
     finalScoreSurfaceObj = finalScoreText.render( "You scored %d points!" % titleBar.score, True, WHITE )
-    finalScoreRectObj    = finalScoreSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 50 ) )
-
-    # Content and Position of High Score Text
-    highScoreText       = pygame.font.Font( "freesansbold.ttf", 18 )
-    highScoreSurfaceObj = highScoreText.render( "Current High Score: %d points!" % dataFile['highscore'], True, WHITE )
-    highScoreRectObj    = highScoreSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 25 ) )    
-
+    finalScoreRectObj    = finalScoreSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery + 50 ) )    
     screen.fill(BLACK)
 
     screen.blit( gameOverSurfaceObj, gameOverRectObj ) # display game over text
     screen.blit( pressKeySurfaceObj, pressKeyRectObj ) # display press any key text
-    screen.blit( highScoreSurfaceObj, highScoreRectObj ) # display high score text
     screen.blit( finalScoreSurfaceObj, finalScoreRectObj ) # display final score text
 
     while keyPressed() == None:
@@ -259,7 +246,6 @@ showTitle()
 worm = Worm(screen, int(round(width / 2)), int(round(height / 2)), 200)
 food = Food(screen)
 titleBar = TitleBar(screen)
-dataFile['highScore'] = titleBar.score
 
 while running:
 
@@ -268,10 +254,7 @@ while running:
     
     if worm.crashed or worm.x <= 0 or worm.x >= width-1 or worm.y <= 0 or worm.y >= height-1:
         print("You Crashed!")
-        if titleBar.score > dataFile['highscore']:
-            dataFile['highscore'] = titleBar.score 
-        showGameOver(titleBar)        
-        dataFile.close()
+        showGameOver(titleBar)
         running = False
     elif worm.eating:
         food.erase()
