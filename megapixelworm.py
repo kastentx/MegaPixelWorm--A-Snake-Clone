@@ -44,7 +44,7 @@ running  = True
 
 # Content and Position of Title text
 titleText       = pygame.font.Font( "freesansbold.ttf", 48 )
-titleSurfaceObj = titleText.render( "Megal Pixel Worm", True, GREEN, BLUE )
+titleSurfaceObj = titleText.render( "Mega Pixel Worm", True, GREEN, BLUE )
 titleRectObj    = titleSurfaceObj.get_rect( center = ( screenRect.centerx, screenRect.centery - 100 ) )
 
 # Content and Position of Game Over text
