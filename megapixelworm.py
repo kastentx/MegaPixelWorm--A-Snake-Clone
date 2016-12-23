@@ -30,7 +30,7 @@ BLACK = (   0,   0,   0 )
 width       = 640
 height      = 430
 titleHeight = 50
-pygame.display.set_caption("Hungry Snake Challenge")
+pygame.display.set_caption("**Mega Pixel Worm**")
 
 # set up the blank black screen
 screen     = pygame.display.set_mode((width, (height+titleHeight)))
@@ -74,7 +74,7 @@ class TitleBar:
         pygame.draw.rect(self.surface, WHITE, (0, height, width, titleHeight), 2)
 
     def drawTitle(self):
-        title = self.font.render("Megal Pixel Worm", True, WHITE)
+        title = self.font.render("Mega Pixel Worm", True, WHITE)
         self.surface.blit(title, (5, (height+10)))
 
     def updateScore(self, score):
